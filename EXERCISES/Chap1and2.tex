@@ -1,0 +1,564 @@
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Statistical Learning}
+\rhead{Exercise Answers}
+\cfoot{\thepage}
+\onehalfspacing
+
+\title{\textbf{Statistical Learning Exercise Answers}\\
+\large Chapter 1 and Linear Regression}
+\author{Student Name: \underline{\hspace{6cm}}\\
+Student ID: \underline{\hspace{6cm}}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Reference}
+These answers are based on \textit{An Introduction to Statistical Learning:
+With Applications in Python (ISLP)} and the exercises provided for the
+course. The ISLP book itself labels Linear Regression as Chapter 3, although
+the course materials may refer to it as Chapter 2.
+
+\section*{CHAPTER ONE}
+
+\subsection*{Question 1: Flexible versus Inflexible Statistical Learning Methods}
+
+\subsubsection*{(a) Very large sample size and small number of predictors}
+
+\textbf{Answer: A flexible method is generally better.}
+
+A very large sample provides enough observations to support a more complex
+model and reduces the risk of overfitting. Since the number of predictors is
+small, the model is also relatively easy to estimate.
+
+\textbf{Memory point:} Large $n$ makes flexibility safer.
+
+\subsubsection*{(b) Very large number of predictors and small number of observations}
+
+\textbf{Answer: An inflexible method is generally better.}
+
+When there are many predictors but few observations, a flexible method can
+fit the training data too closely and overfit. A less flexible method is
+generally more stable and has lower variance.
+
+\textbf{Memory point:} Small $n$ + large $p$ means avoid excessive flexibility.
+
+\subsubsection*{(c) Highly non-linear relationship between predictors and response}
+
+\textbf{Answer: A flexible method is generally better.}
+
+A flexible method can capture complicated and non-linear relationships
+between the predictors and the response, whereas a highly inflexible model
+may be too restrictive.
+
+\textbf{Memory point:} Non-linear relationship means flexibility helps.
+
+\subsubsection*{(d) Extremely high error variance}
+
+\textbf{Answer: An inflexible method is generally better.}
+
+High error variance means that the data contain substantial random noise.
+A highly flexible method may attempt to fit this noise and overfit the
+training data. A simpler model is generally more stable.
+
+\textbf{Memory point:} High noise means keep the model simple.
+
+\begin{center}
+\begin{tabular}{l l l}
+\toprule
+Part & Better method & Main reason\\
+\midrule
+(a) & Flexible & Large sample reduces overfitting risk\\
+(b) & Inflexible & Small sample and many predictors increase overfitting\\
+(c) & Flexible & Captures non-linear relationships\\
+(d) & Inflexible & High noise makes flexibility risky\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+
+\subsection*{Question 10: Boston Housing Data}
+
+\subsubsection*{(a) Loading the Boston data set}
+
+The Python version of ISLP uses the \texttt{ISLP} package. The data can be
+loaded using:
+
+\begin{verbatim}
+from ISLP import load_data
+Boston = load_data("Boston")
+\end{verbatim}
+
+\subsubsection*{(b) Number of rows and columns}
+
+The Boston data set contains:
+
+\[
+\boxed{506\text{ rows and }13\text{ columns}}
+\]
+
+Each row represents a Boston suburb/census tract. The columns represent
+characteristics of the suburb, including crime rate, zoning, industrial
+activity, Charles River location, pollution, number of rooms, housing age,
+distance to employment centres, highway accessibility, tax rate,
+pupil-teacher ratio, lower-status population percentage, and median house
+value.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Variable & Meaning\\
+\midrule
+\texttt{crim} & Per-capita crime rate\\
+\texttt{zn} & Proportion of residential land zoned for large lots\\
+\texttt{indus} & Proportion of non-retail business land\\
+\texttt{chas} & Charles River indicator\\
+\texttt{nox} & Nitrogen oxide concentration\\
+\texttt{rm} & Average rooms per dwelling\\
+\texttt{age} & Proportion of older owner-occupied homes\\
+\texttt{dis} & Distance to employment centres\\
+\texttt{rad} & Accessibility to radial highways\\
+\texttt{tax} & Property-tax rate\\
+\texttt{ptratio} & Pupil-teacher ratio\\
+\texttt{lstat} & Lower-status population percentage\\
+\texttt{medv} & Median value of owner-occupied homes\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection*{(c) Pairwise scatterplots}
+
+The scatterplots show several relationships among the variables. In
+particular, \texttt{rad} and \texttt{tax} have a strong positive relationship,
+while \texttt{indus} and \texttt{nox} are positively related. \texttt{age}
+and \texttt{nox} also tend to be positively related.
+
+There are negative relationships between \texttt{dis} and several other
+variables. In addition, \texttt{rm} and \texttt{lstat} show a negative
+relationship. Overall, the scatterplots indicate that several predictors
+are correlated with one another.
+
+\subsubsection*{(d) Predictors associated with per-capita crime rate}
+
+Yes. Crime rate is associated with several predictors.
+
+The strongest positive associations include \texttt{rad}, \texttt{tax},
+\texttt{indus}, \texttt{nox}, and \texttt{lstat}. Crime is negatively
+associated with variables such as \texttt{dis}, \texttt{zn}, and
+\texttt{medv}.
+
+The crime-rate variable ranges from approximately
+\[
+0.00632\text{ to }88.9762,
+\]
+and its distribution is strongly right-skewed.
+
+\subsubsection*{(e) High crime, tax rates, and pupil-teacher ratios}
+
+Some suburbs have particularly high crime rates. The range of \texttt{crim}
+is approximately
+\[
+0.00632\text{ to }88.9762.
+\]
+
+The tax rate ranges from
+\[
+187\text{ to }711.
+\]
+
+The pupil-teacher ratio ranges from
+\[
+12.6\text{ to }22.0.
+\]
+
+Crime has much more extreme variation than the pupil-teacher ratio. The
+crime distribution is strongly right-skewed, with a small number of suburbs
+having exceptionally high crime rates.
+
+\subsubsection*{(f) Suburbs bordering the Charles River}
+
+The variable \texttt{chas} equals 1 when a suburb bounds the Charles River
+and 0 otherwise.
+
+There are:
+\[
+\boxed{35\text{ suburbs}}
+\]
+that bound the Charles River.
+
+\subsubsection*{(g) Median pupil-teacher ratio}
+
+The median pupil-teacher ratio is:
+\[
+\boxed{19.05}
+\]
+
+Thus, the median is approximately 19.05 pupils per teacher.
+
+\subsubsection*{(h) Lowest median value of owner-occupied homes}
+
+Two suburbs have the lowest median house value: observations 399 and 406.
+For both,
+\[
+\texttt{medv}=5,
+\]
+which corresponds to \$5,000 because \texttt{medv} is measured in thousands
+of dollars.
+
+These two observations have several unusual characteristics, including
+very high crime, older housing, high highway accessibility, relatively high
+taxes, and relatively high pupil-teacher ratios. They also have relatively
+low numbers of rooms and relatively high values of \texttt{lstat}.
+
+\textbf{Conclusion:} The two lowest-value observations have several
+unfavourable socioeconomic and environmental characteristics.
+
+\subsubsection*{(i) Suburbs with more than seven and eight rooms}
+
+There are:
+\[
+\boxed{64}
+\]
+suburbs with more than seven rooms per dwelling.
+
+There are:
+\[
+\boxed{13}
+\]
+suburbs with more than eight rooms per dwelling.
+
+The 13 suburbs with more than eight rooms are relatively uncommon and tend
+to have higher median house values and lower percentages of lower-status
+population.
+
+\newpage
+
+\section*{LINEAR REGRESSION}
+
+\subsection*{Question 1: Hypothesis Tests and p-values}
+
+The question concerns the multiple linear regression model relating
+\textit{Sales} to \textit{TV}, \textit{radio}, and \textit{newspaper}
+advertising.
+
+For each predictor, the null hypothesis is that the corresponding
+advertising medium has no association with Sales after accounting for the
+other advertising media.
+
+\subsubsection*{TV}
+
+\[
+H_0:\text{TV advertising spending has no association with Sales,}
+\]
+after accounting for radio and newspaper advertising.
+
+The p-value is less than 0.0001. Therefore, we reject $H_0$.
+
+\textbf{Conclusion:} There is very strong evidence that TV advertising
+spending is associated with Sales after accounting for radio and newspaper
+advertising.
+
+\subsubsection*{Radio}
+
+\[
+H_0:\text{radio advertising spending has no association with Sales,}
+\]
+after accounting for TV and newspaper advertising.
+
+The p-value is less than 0.0001. Therefore, we reject $H_0$.
+
+\textbf{Conclusion:} There is very strong evidence that radio advertising
+spending is associated with Sales after accounting for TV and newspaper
+advertising.
+
+\subsubsection*{Newspaper}
+
+\[
+H_0:\text{newspaper advertising spending has no association with Sales,}
+\]
+after accounting for TV and radio advertising.
+
+The p-value is 0.8599. Since this is greater than 0.05, we fail to reject
+$H_0$.
+
+\textbf{Conclusion:} There is insufficient evidence that newspaper
+advertising spending is associated with Sales after accounting for TV and
+radio advertising.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Predictor & p-value & Conclusion\\
+\midrule
+TV & $<0.0001$ & Significant association\\
+Radio & $<0.0001$ & Significant association\\
+Newspaper & $0.8599$ & Not significant\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+
+\subsection*{Question 6: Least Squares Line}
+
+The fitted simple linear regression line is
+\[
+\hat{y}=\hat{\beta}_0+\hat{\beta}_1x.
+\]
+
+The least-squares estimate of the intercept is
+\[
+\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}.
+\]
+
+Set $x=\bar{x}$:
+\[
+\hat{y}
+=
+\hat{\beta}_0+\hat{\beta}_1\bar{x}.
+\]
+
+Substituting the intercept estimate gives
+\[
+\hat{y}
+=
+(\bar{y}-\hat{\beta}_1\bar{x})
++\hat{\beta}_1\bar{x}
+=
+\bar{y}.
+\]
+
+Therefore, the least-squares regression line always passes through
+\[
+\boxed{(\bar{x},\bar{y})}.
+\]
+
+\textbf{Memory point:} At average $X$, predicted $Y$ equals average $Y$.
+
+\newpage
+
+\subsection*{Question 11: Regression Without an Intercept}
+
+The exercise generates data according to
+\[
+x\sim N(0,1),\qquad y=2x+\epsilon,
+\]
+using the specified random seed.
+
+\subsubsection*{(a) Regress $y$ onto $x$ without an intercept}
+
+The model is
+\[
+Y=\beta X+\epsilon.
+\]
+
+Using the specified data, the results are approximately:
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Quantity & Result\\
+\midrule
+$\hat{\beta}$ & 1.9762\\
+$SE(\hat{\beta})$ & 0.11695\\
+$t$-statistic & 16.8984\\
+$p$-value & $6.23\times10^{-31}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+We test
+\[
+H_0:\beta=0.
+\]
+
+Because the p-value is extremely small, we reject $H_0$.
+
+\textbf{Conclusion:} There is extremely strong evidence of an association
+between $x$ and $y$. The estimated slope is approximately 1.98, close to
+the true slope of 2.
+
+\subsubsection*{(b) Regress $x$ onto $y$ without an intercept}
+
+The reversed model is
+\[
+X=\beta Y+\epsilon.
+\]
+
+The results are approximately:
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Quantity & Result\\
+\midrule
+$\hat{\beta}$ & 0.37574\\
+$SE(\hat{\beta})$ & 0.02224\\
+$t$-statistic & 16.8984\\
+$p$-value & $6.23\times10^{-31}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The coefficient changes, but the t-statistic and p-value remain the same.
+
+\subsubsection*{(c) Relationship between (a) and (b)}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+ & $Y$ on $X$ & $X$ on $Y$\\
+\midrule
+Coefficient & 1.9762 & 0.37574\\
+Standard error & 0.11695 & 0.02224\\
+$t$-statistic & 16.8984 & 16.8984\\
+$p$-value & $6.23\times10^{-31}$ & $6.23\times10^{-31}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Thus,
+\[
+\boxed{t_{Y\mid X}=t_{X\mid Y}}
+\]
+and
+\[
+\boxed{p_{Y\mid X}=p_{X\mid Y}}.
+\]
+
+The direction of regression changes the coefficient because the variables
+have different scales, but it does not change the strength of evidence
+against the null hypothesis.
+
+\subsubsection*{(d) Derivation of the t-statistic}
+
+For regression of $Y$ onto $X$ without an intercept,
+\[
+\hat{\beta}
+=
+\frac{\sum_{i=1}^{n}x_i y_i}
+{\sum_{i=1}^{n}x_i^2}.
+\]
+
+The standard error is
+\[
+SE(\hat{\beta})
+=
+\sqrt{
+\frac{\sum_{i=1}^{n}(y_i-x_i\hat{\beta})^2}
+{(n-1)\sum_{i=1}^{n}x_i^2}
+}.
+\]
+
+Let
+\[
+A=\sum x_i y_i,\qquad B=\sum x_i^2.
+\]
+
+Then
+\[
+\hat{\beta}=\frac{A}{B}.
+\]
+
+Expanding the residual sum of squares gives
+\[
+\sum(y_i-x_i\hat{\beta})^2
+=
+\sum y_i^2-\frac{A^2}{B}.
+\]
+
+Therefore,
+\[
+SE(\hat{\beta})
+=
+\frac{\sqrt{B\sum y_i^2-A^2}}
+{\sqrt{n-1}\,B}.
+\]
+
+Hence,
+\[
+\boxed{
+t=
+\frac{
+\sqrt{n-1}\sum_{i=1}^{n}x_i y_i
+}{
+\sqrt{
+\left(\sum_{i=1}^{n}x_i^2\right)
+\left(\sum_{i=1}^{n}y_i^2\right)
+-
+\left(\sum_{i=1}^{n}x_i y_i\right)^2
+}
+}
+}.
+\]
+
+\subsubsection*{(e) Equality of the t-statistics}
+
+The formula above is symmetric in $x$ and $y$. Since
+\[
+\sum x_i y_i=\sum y_i x_i,
+\]
+switching $x$ and $y$ leaves both the numerator and denominator unchanged.
+
+Therefore,
+\[
+\boxed{t_{Y\text{ on }X}=t_{X\text{ on }Y}}.
+\]
+
+\subsubsection*{(f) Regression with an intercept}
+
+When an intercept is included, the t-statistic for
+\[
+H_0:\beta_1=0
+\]
+is also the same whether $Y$ is regressed on $X$ or $X$ is regressed on
+$Y$.
+
+In simple linear regression with an intercept,
+\[
+t=r\sqrt{\frac{n-2}{1-r^2}},
+\]
+where $r$ is the sample correlation.
+
+Because
+\[
+\operatorname{Cor}(X,Y)=\operatorname{Cor}(Y,X),
+\]
+the t-statistic is identical in both regression directions.
+
+\[
+\boxed{t_{Y\text{ on }X}=t_{X\text{ on }Y}}
+\]
+
+\section*{Final Revision Points}
+
+\begin{itemize}[leftmargin=*]
+    \item Small p-value $\Rightarrow$ reject $H_0$.
+    \item Large p-value $\Rightarrow$ fail to reject $H_0$.
+    \item In simple linear regression, the least-squares line passes through
+    $(\bar{x},\bar{y})$.
+    \item Flexible methods are useful when there is enough data or a
+    complicated non-linear relationship.
+    \item Inflexible methods are safer when the sample is small or the data
+    contain substantial noise.
+    \item Reversing simple regression changes the coefficient, but the
+    t-statistic for a zero-slope test remains the same.
+\end{itemize}
+
+\end{document}
